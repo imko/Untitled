@@ -19,4 +19,5 @@ app.use(errorHandler.errorHandler);
 
 app.listen(config.PORT, () => console.log(`Server connected on PORT ${config.PORT}`));
 
+// TODO: Add testing
 // TODO: Add more API routes 

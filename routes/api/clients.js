@@ -3,11 +3,14 @@ const router = express.Router();
 const faker = require('faker');
 const Client = require('../../models/client');
 
-router.get('/', (req, res) => {
+router.get('/', (req, res, next) => {
     Client
         .find({})
         .then(clients => res.json(clients))
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            next(err);
+        });
 });
 
 router.post('/', (req, res, next) => {
@@ -56,7 +59,7 @@ router.get('/:id', (req, res, err) => {
         });
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', (req, res, next) => {
     const id = req.params.id;
     const client = {
         image: req.body.image,
@@ -75,17 +78,20 @@ router.put('/:id', (req, res) => {
         })
         .catch(err => {
             console.log(err);
-            return res.status(400).send({ error: 'Invalid ID' });
+            next(err);
         });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', (req, res, next) => {
     const id = req.params.id;
 
     Client
         .findByIdAndRemove(id)
         .then(result => res.status(200).end())
-        .catch(err => res.status(400).send({ error: 'Invalid ID' }));
+        .catch(err => {
+            console.log(err);
+            next(err);
+        });
 });
 
 module.exports = router; 
