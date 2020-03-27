@@ -41,7 +41,7 @@ router.post('/', (req, res, next) => {
         });
 });
 
-router.get('/:id', (req, res, err) => {
+router.get('/:id', (req, res, next) => {
     const id = req.params.id;
 
     Client

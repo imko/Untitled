@@ -12,7 +12,7 @@ const unknownEndpoint = (req, res) => res.status(404).send({ error: 'Unknown end
 const errorHandler = (err, req, res, next) => {
     logger.error(err.message);
 
-    if (err === 'CastError' && err.kind === 'ObjectId') {
+    if (err.name === 'CastError' && err.kind === 'ObjectId') {
         return res.status(400).send({ error: 'Invalid ID' });
     } else if (err.name === 'ValidationError') {
         return res.status(400).json({ err: err.message });
