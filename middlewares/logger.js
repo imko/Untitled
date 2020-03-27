@@ -1,4 +1,7 @@
-const morgan = require('morgan');
+const info = (...params) => console.log(...params);
+const error = (...params) => console.log(...params);
 
-module.exports = morgan(':method :url :status :res[content-length] - :response-time ms');
-
+module.exports = {
+    info,
+    error
+};

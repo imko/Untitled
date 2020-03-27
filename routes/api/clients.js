@@ -1,76 +1,91 @@
 const express = require('express');
 const router = express.Router();
 const faker = require('faker');
-let clients = require('../../Clients');
+const Client = require('../../models/client');
 
 router.get('/', (req, res) => {
-    res.json(clients);
+    Client
+        .find({})
+        .then(clients => res.json(clients))
+        .catch(err => console.log(err));
 });
 
-router.post('/', (req, res) => {
+router.post('/', (req, res, next) => {
     const body = req.body;
 
     if (!body.firstName || !body.lastName || !body.address || !body.phoneNumber || !body.email) {
         return res.status(400).send({ error: 'Missing information' });
     }
 
-    const client = {
-        id: faker.random.uuid(),
-        image: faker.image.avatar(),
+    const client = new Client({
+        image: body.image || faker.image.avatar(),
         firstName: body.firstName,
         lastName: body.lastName,
         address: body.address,
         phoneNumber: body.phoneNumber,
         email: body.email,
         date: new Date().toISOString()
-    };
+    });
 
-    clients.push(client);
-
-    return res.status(201).end();
+    client.save()
+        .then(client => {
+            console.log(client);
+            return res.status(201).end();
+        })
+        .catch(err => {
+            console.log(err);
+            next(err);
+        });
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res, err) => {
     const id = req.params.id;
-    const client = clients.find(client => client.id === id);
 
-    if (client) {
-        return res.json(client);
-    }
+    Client
+        .findById(id)
+        .then(client => {
+            if (client) {
+                return res.json(client.toJSON());
+            }
 
-    return res.status(400).send({ error: 'Invalid ID' });
+            return status(404).end();
+        })
+        .catch(err => {
+            console.log(err);
+            next(err);
+        });
 });
 
 router.put('/:id', (req, res) => {
     const id = req.params.id;
-    const { firstName, lastName, address, phoneNumber, email } = req.body;
-    let client = clients.find(client => client.id === id);
+    const client = {
+        image: req.body.image,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        address: req.body.address,
+        phoneNumber: req.body.phoneNumber,
+        email: req.body.email
+    };
 
-    if (client) {
-        client.firstName = firstName || client.firstName;
-        client.lastName = lastName || client.lastName;
-        client.address = address || client.address;
-        client.phoneNumber = phoneNumber || client.phoneNumber;
-        client.email = email || client.email;
-        client.date = new Date().toISOString();
-
-        return res.status(200).end();
-    }
-
-    return res.status(400).send({ error: 'Invalid ID' });
+    Client
+        .findByIdAndUpdate(id, client, { new: true })
+        .then(updatedClient => {
+            console.log(updatedClient);
+            return res.status(200).end();
+        })
+        .catch(err => {
+            console.log(err);
+            return res.status(400).send({ error: 'Invalid ID' });
+        });
 });
 
 router.delete('/:id', (req, res) => {
     const id = req.params.id;
-    const found = clients.some(client => client.id === id);
 
-    if (found) {
-        clients = clients.filter(client => client.id !== id);
-
-        return res.status(200).end();
-    }
-
-    return res.status(400).send({ error: 'Invalid ID' });
+    Client
+        .findByIdAndRemove(id)
+        .then(result => res.status(200).end())
+        .catch(err => res.status(400).send({ error: 'Invalid ID' }));
 });
 
 module.exports = router; 
