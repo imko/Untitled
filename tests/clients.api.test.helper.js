@@ -2,12 +2,10 @@
 
 const faker = require('faker');
 
-let clients = [];
+let clientsApiTestHelper = [];
 
-// Generate clients with fake data 
-for (let i = 0; i < 5; i++) {
-    const client = {
-        id: faker.random.uuid(),
+const generateRandomClient = () => {
+    return {
         image: faker.image.avatar(),
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
@@ -19,10 +17,15 @@ for (let i = 0; i < 5; i++) {
         },
         phoneNumber: faker.phone.phoneNumber(),
         email: faker.internet.email(),
-        date: faker.date.future(),
     };
+};
 
-    clients.push(client);
+// Generate clientsApiTestHelper with fake data
+for (let i = 0; i < 20; i++) {
+    clientsApiTestHelper.push(generateRandomClient());
 }
 
-module.exports = clients; 
+module.exports = {
+    clients: clientsApiTestHelper,
+    generateRandomClient
+};

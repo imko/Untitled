@@ -1,9 +1,4 @@
 const mongoose = require('mongoose');
-const config = require('../utils/config');
-
-mongoose.connect(config.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(res => console.log('Connected to MongoDB'))
-    .catch(err => console.log('Failed to connect to MongoDB', err.message));
 
 const clientSchema = new mongoose.Schema({
     image: String,
