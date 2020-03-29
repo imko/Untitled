@@ -1,8 +1,14 @@
-/* Temporary JS file for generating fake data  */
-
 const faker = require('faker');
+const Client = require('../models/client');
 
-let clients = [];
+const clients = [];
+
+const getRandomClient = async () => {
+    const clients = await Client.find({});
+    const index = Math.floor(Math.random() * clients.length);
+
+    return clients[index];
+};
 
 const generateRandomClient = () => {
     return {
@@ -30,5 +36,6 @@ for (let i = 0; i < 20; i++) {
 
 module.exports = {
     clients,
-    generateRandomClient
+    generateRandomClient,
+    getRandomClient
 };

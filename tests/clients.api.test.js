@@ -10,7 +10,7 @@ const api = supertest(app);
 beforeEach(async () => {
     await Client.deleteMany({});
 
-    const clientObjects = [];
+    // const clientObjects = [];
     for (const client of helper.clients) {
         // Hash the user's password
         const saltRounds = 10;
@@ -204,6 +204,4 @@ describe('Test clients deleted by HTTP DELETE', () => {
     });
 });
 
-afterAll(() => {
-    mongoose.connection.close();
-});
+afterAll(() => mongoose.connection.close());

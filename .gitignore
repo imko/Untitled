@@ -2,3 +2,5 @@ node_modules
 .idea
 .env
 .eslintrc.js
+jest.config.js
+jest.setup.js
