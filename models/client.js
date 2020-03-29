@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const clientSchema = new mongoose.Schema({
+    userName: {
+        type: String,
+    },
+    password: String,
     image: String,
     firstName: {
         type: String,
@@ -18,13 +22,19 @@ const clientSchema = new mongoose.Schema({
     },
     phoneNumber: {
         type: String,
-        required: true
+        required: true,
     },
     email: {
         type: String,
-        required: true
+        required: true,
     },
-    date: String
+    date: String,
+    appointments: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Appointment'
+        }
+    ]
 });
 
 clientSchema.set('toJSON', {
@@ -32,6 +42,7 @@ clientSchema.set('toJSON', {
         returnedObject.id = returnedObject._id.toString();
         delete returnedObject._id;
         delete returnedObject.__v;
+        delete returnedObject.password;
     }
 });
 

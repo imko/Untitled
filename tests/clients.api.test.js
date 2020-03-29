@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const supertest = require('supertest');
 const app = require('../app');
@@ -9,9 +10,21 @@ const api = supertest(app);
 beforeEach(async () => {
     await Client.deleteMany({});
 
+    const clientObjects = [];
     for (const client of helper.clients) {
-        await new Client(client).save();
+        // Hash the user's password
+        const saltRounds = 10;
+        const passwordHash = await bcrypt.hash(client.password, saltRounds);
+
+        const c = new Client(client);
+        c.password = passwordHash;
+        // clientObjects.push(c);
+        await c.save();
     }
+
+    // const clientObjects = helper.clients.map(client => new Client(client));
+    // const promiseArray = clientObjects.map(client => client.save());
+    // await Promise.all(promiseArray);
 });
 
 describe('Test clients returned by HTTP GET', () => {
@@ -42,6 +55,14 @@ describe('Test clients returned by HTTP GET', () => {
             .get(`/api/clients/${clients.body[0].id}`)
             .expect(200)
             .expect('Content-Type', /application\/json/);
+    });
+
+    test('All clients do not show password', async () => {
+        const clients = await api
+            .get('/api/clients')
+            .expect(200);
+
+        clients.body.forEach(client => expect(client.password).toBeUndefined());
     });
 });
 
