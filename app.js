@@ -6,6 +6,7 @@ const logger = require('./middlewares/logger');
 const config = require('./utils/config');
 const clientsRouter = require('./controllers/api/clients');
 const appointmentRouter = require('./controllers/api/appointments');
+const loginRouter = require('./controllers/api/login');
 
 (async () => {
     try {
@@ -24,6 +25,7 @@ app.get('/', (req, res) => res.send('<h1>Hello world</h1>'));
 
 app.use('/api/clients', clientsRouter);
 app.use('/api/appointments', appointmentRouter);
+app.use('/api/login', loginRouter);
 
 app.use(errorHandler.unknownEndpoint);
 app.use(errorHandler.errorHandler);
