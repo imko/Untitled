@@ -1,7 +1,18 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
+const jwt = require('jsonwebtoken');
+const config = require('../../utils/config');
 const Client = require('../../models/client');
 const Appointment = require('../../models/appointment');
+
+const getTokenFromRequest = req => {
+    const authorization = req.get('authorization');
+
+    if (authorization && authorization.toLowerCase().startsWith('bearer')) {
+        return authorization.substring(7);
+    }
+
+    return null;
+};
 
 router.get('/', async (req, res, next) => {
     try {
@@ -14,9 +25,16 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     const body = req.body;
+    const token = getTokenFromRequest(req);
 
     try {
-        const client = await Client.findById(body.client);
+        const verifiedToken = jwt.verify(token, config.SECRET); // Contains username and id which indicates who made the request
+
+        if (!token || !verifiedToken.id) {
+            return res.status(401).send({ error: 'Token missing or invalid' });
+        }
+
+        const client = await Client.findById(verifiedToken.id);
 
         if (client) {
             const appointment = new Appointment({

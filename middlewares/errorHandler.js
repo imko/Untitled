@@ -16,6 +16,8 @@ const errorHandler = (err, req, res, next) => {
         return res.status(400).send({ error: 'Invalid ID' });
     } else if (err.name === 'ValidationError') {
         return res.status(400).json({ err: err.message });
+    } else if (err.name === 'JsonWebTokenError') {
+        return err.status(401).json({ err: 'Invalid token' });
     }
 
     next(err);
