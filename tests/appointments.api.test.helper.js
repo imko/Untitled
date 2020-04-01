@@ -31,5 +31,6 @@ const generateRandomAppointment = async () => {
 
 module.exports = {
     appointments,
-    generateRandomAppointment
+    generateRandomAppointment,
+    faker
 };

@@ -8,7 +8,7 @@ router.post('/', async (req, res, next) => {
     const body = req.body;
 
     try {
-        const client = await Client.findOne({userName: body.userName});
+        const client = await Client.findOne({ userName: body.userName });
         const correctPassword = client === null ? false : await bcrypt.compare(body.password, client.password);
 
         if (!client || !correctPassword) {

@@ -57,8 +57,40 @@ describe('Test appointments returned by HTTP GET', () => {
 describe('Test appointments added by HTTP POST', () => {
     test('Appointment with valid payload', async () => {
         const appointment = await helper.generateRandomAppointment();
+
+        // Create a test user
+        const client = {
+            userName: 'testUser',
+            password: 'testPassword',
+            image: helper.faker.image.avatar(),
+            firstName: helper.faker.name.firstName(),
+            lastName: helper.faker.name.lastName(),
+            address: {
+                streetAddress: helper.faker.address.streetAddress(),
+                city: helper.faker.address.city(),
+                country: helper.faker.address.country(),
+                postalCode: helper.faker.address.zipCode()
+            },
+            phoneNumber: helper.faker.phone.phoneNumber(),
+            email: helper.faker.internet.email(),
+            appointments: []
+        };
+
+        await api
+            .post('/api/clients')
+            .send(client)
+            .expect(201)
+            .expect('Content-Type', /application\/json/);
+
+        const verification = await api
+            .post('/api/login')
+            .send({ userName: 'testUser', password: 'testPassword' })
+            .expect(200)
+            .expect('Content-Type', /application\/json/);
+
         await api
             .post('/api/appointments')
+            .set('Authorization', `Bearer ${verification.body.token}`)
             .send(appointment)
             .expect(201)
             .expect('Content-Type', /application\/json/);
@@ -76,8 +108,21 @@ describe('Test appointments added by HTTP POST', () => {
     });
 
     test('Existing appointment in the database', async () => {
+        const verification = await api
+            .post('/api/login')
+            .send({ userName: 'testUser', password: 'testPassword' })
+            .expect(200)
+            .expect('Content-Type', /application\/json/);
+
+        await api
+            .post('/api/appointments')
+            .set('Authorization', `Bearer ${verification.body.token}`)
+            .send(helper.appointments[0])
+            .expect(201);
+
         const result = await api
             .post('/api/appointments')
+            .set('Authorization', `Bearer ${verification.body.token}`)
             .send(helper.appointments[0])
             .expect(400);
 
@@ -86,7 +131,7 @@ describe('Test appointments added by HTTP POST', () => {
             .expect(200);
 
         expect(result.body).toEqual({ error: 'Existing appointment' });
-        expect(appointments.body.length).toBe(helper.appointments.length);
+        expect(appointments.body.length).toBe(helper.appointments.length + 1);
     });
 });
 
